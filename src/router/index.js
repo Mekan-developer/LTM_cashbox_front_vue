@@ -5,6 +5,7 @@ import AnalyticsDashboard from "@/views/AnalyticsDashboard.vue";
 import CurrencyList from "@/views/currencies/CurrencyList.vue";
 import RecordList from "@/views/records/RecordList.vue";
 import RecordCreate from "@/views/records/RecordCreate.vue";
+import UserPage from "@/views/users/UserPage.vue";
 
 
 const routes = [
@@ -15,6 +16,7 @@ const routes = [
   { path: '/currencies', component: CurrencyList, meta: { requiresAuth: true } },
   { path: '/records', component: RecordList, meta: { requiresAuth: true } },
   { path: '/analytics', component: AnalyticsDashboard, meta: { requiresAuth: true } },
+  { path: '/user', component: UserPage, meta: { requiresAuth: true } },
 
     { path: '/records/create', component: RecordCreate, meta: { requireAuth:true } },
 

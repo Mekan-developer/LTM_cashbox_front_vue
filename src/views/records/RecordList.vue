@@ -1,107 +1,91 @@
 <template>
-  <div>
+  <div class="w-full">
+    <div class="flex flex-row items-center justify-between p-4 mb-6">
+      <div>
+        <h2 class="mb-6 text-2xl font-bold text-blue-600">📋 Список записей</h2>
+      </div>       
+        <button class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700" @click="showModal = true">Добавить record</button>
+    </div>
     
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="mb-4 text-2xl font-bold">📊 Записи по кассе</h2>
-      <button class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700" @click="showModal = true">Добавить record</button>
+    <div class="p-4">
+      <RecordTable />
     </div>
-
-    <div class="p-4 overflow-x-auto bg-white rounded shadow">
-      <table class="w-full table-auto">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="p-2">kassa</th>
-            <th class="p-2">Тип(daxod/rashod)</th>
-            <th class="p-2">Сумма</th>
-            <th class="p-2">Валюта</th>
-            <th class="p-2">Дата</th>
-            <th class="p-2">Описание</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="record in records" :key="record.id" >
-            <td class="p-2 text-center">{{ record.type }}</td>
-            <td class="p-2 text-center">{{ record.amount }}</td>
-            <td class="p-2 text-center">{{ record.currency }}</td>
-            <td class="p-2 text-center">{{ record.date }}</td>
-            <td class="p-2 text-center">{{ record.article_description }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center h-full overflow-auto bg-black p-18 bg-opacity-40">
-      <div class="relative w-full max-w-md mt-4 bg-white rounded-xl">
-        <div class="absolute top-[15px] right-[15px] p-1 cursor-pointer" @click="showModal = false">
+  
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-end bg-[#000000e1] text-[14px]">
+      <div class="relative h-full pb-6 bg-gray-50">
+        <div class="absolute top-0 left-0 flex justify-center items-center w-[40px] rounded-full aspect-square border-[1px] cursor-pointer border-gray-300" @click="showModal = false">
+          
             <svg width="24" height="24" class="text-red-900" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
         </div>
-        <div class="max-w-3xl p-8 mx-auto bg-white shadow-md rounded-xl">
-          <h2 class="mb-4 text-2xl font-semibold">Создать запись</h2>
 
-          <form @submit.prevent="submitRecord">
-            <div>
-              <label class="block">Касса</label>
-              <select v-model="form.cashbox_id" class="input">
-                <option value="">-- Выбрать --</option>
-                <option v-for="box in cashboxes" :key="box.id" :value="box.id">{{ box.title }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block">Тип записи</label>
-              <select v-model="form.type" class="input">
-                <option value="income">Доход</option>
-                <option value="expense">Расход</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block">Сумма</label>
-              <input type="number" v-model="form.original_amount" class="input" />
-            </div>
-
-            <div>
-              <label class="block">Валюта</label>
-              <select v-model="form.original_currency" class="input">
-                <option value="">-- Выбрать --</option>
-                <option v-for="cur in currencies" :key="cur.code" :value="cur.code">{{ cur.name }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block">Дата</label>
-              <input type="date" v-model="form.date" class="input" />
-            </div>
-
-            <div>
-              <label class="block">Описание статьи</label>
-              <input type="text" v-model="form.article_description" class="input" />
-            </div>
-
-            <!-- ✅ Новый чекбокс -->
-            <div class="flex items-center space-x-2">
-              <input type="checkbox" v-model="form.is_debt" id="is_debt" />
-              <label for="is_debt">Записать как долг</label>
-            </div>
-
-            <!-- ✅ Новые поля: ссылка и объект -->
-            <div>
-              <label class="block">Ссылка</label>
-              <input type="text" v-model="form.link" class="input" />
-            </div>
-
-            <div>
-              <label class="block">Объект</label>
-              <input type="text" v-model="form.object" class="input" />
-            </div>
-
-            <button type="submit" class="px-4 py-2 mt-1 text-white bg-blue-600 rounded hover:bg-blue-700">
-              Сохранить запись
-            </button>
-          </form>
+        <div class=" flex justify-center items-center border-b-2 border-b-gray-300 w-full h-[40px]">
+          <span class="text-blue-500">создать запись</span>
         </div>
+       
+        <form @submit.prevent="submitRecord" class="w-[400px] p-4 h-full overflow-y-scroll flex flex-col gap-2 ">
+          <div>
+            <label for="kassa">Касса</label>
+            <select v-model="form.cashbox_id" class="input" id="kassa">
+              <option value="">-- Выбрать --</option>
+              <option v-for="box in cashboxes" :key="box.id" :value="box.id">{{ box.title }}</option>
+            </select>
+          </div>
+  
+          <div>
+            <label>Тип записи</label>
+            <select v-model="form.type" class="input">
+              <option value="1">Доход</option>
+              <option value="0">Расход</option>
+            </select>
+          </div>
+  
+          <div>
+            <label for="sum">Сумма</label>
+            <input type="number" v-model="form.original_amount" class="input" id="sum" />
+          </div>
+  
+          <div>
+            <label>Валюта</label>
+            <select v-model="form.original_currency" class="input">
+              <option value="">-- Выбрать --</option>
+              <option v-for="cur in currencies" :key="cur.code" :value="cur.code">{{ cur.name }}</option>
+            </select>
+          </div>
+  
+          <div>
+            <label>Дата</label>
+            <input type="date" v-model="form.date" class="input" />
+          </div>
+  
+          <div>
+            <label>Описание статьи</label>
+            <input type="text" v-model="form.article_description" class="input" />
+          </div>
+  
+          <!-- ✅ Новый чекбокс -->
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" v-model="form.is_debt" id="is_debt" />
+            <label for="is_debt">Записать как долг</label>
+          </div>
+  
+          <!-- ✅ Новые поля: ссылка и объект -->
+          <div>
+            <label>Ссылка</label>
+            <input type="text" v-model="form.link" class="input" />
+          </div>
+  
+          <div>
+            <label>Объект</label>
+            <input type="text" v-model="form.object" class="input" />
+          </div>
+  
+          <button type="submit" class="text-white w-full mt-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ">
+            Сохранить запись
+          </button>
+        </form>
+
       </div>
     </div>
   </div>
@@ -109,10 +93,14 @@
 
 <script>
 import axios from '@/api/api'
+import RecordTable from '@/components/RecordTable.vue'
 
 export default {
+  components:{
+    RecordTable
+  },
   data() {
-    return {
+    return {    
       records: [],
       loading: true,
       showModal: false,
@@ -121,7 +109,7 @@ export default {
       cashboxes: [],
       form: {
         cashbox_id: '',
-        type: 'income',
+        type: 1,
         original_amount: '',
         original_currency: '',
         date: new Date().toISOString().split('T')[0],
@@ -153,6 +141,7 @@ export default {
 
    async submitRecord() {
       try {
+        console.log(this.form);
         await axios.post('/records', this.form)
         alert('Запись успешно добавлена!')
         this.$router.push('/records')
@@ -163,4 +152,13 @@ export default {
     }
   },
 }
+
+
+
+
 </script>
+<style scoped>
+label{
+  margin:0;
+}
+</style>
