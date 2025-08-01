@@ -1,8 +1,8 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="w-full max-w-sm p-8 bg-white shadow-xl rounded-xl">
-            <h2 class="mb-6 text-2xl font-bold text-center text-blue-700">Вход</h2>
-            <form @submit.prevent="login" autocomplete="off">
+    <div class="flex items-center justify-center h-full bg-white">
+        <div class="w-full max-w-md p-8 py-10 bg-gray-800 shadow-xl rounded-xl">
+            <h2 class="mb-6 text-2xl font-bold text-center text-gray-400">Вход</h2>
+            <form @submit.prevent="login" autocomplete="off"> 
                 <div class="mb-4">
                     <input v-model="email" type="email" placeholder="Email" required
                         class="block w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -53,7 +53,7 @@ export default {
             } catch (e) {
                 this.error = e.response?.data?.message || 'Ошибка входа';
             } finally {
-                this.loading = false;
+                this.loading = false
             }
         },
     },

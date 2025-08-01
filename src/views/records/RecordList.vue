@@ -1,13 +1,13 @@
 <template>
   <div class="w-full">
-    <div class="flex flex-row items-center justify-between p-4 mb-6">
+    <div class="flex flex-row items-center justify-between p-1 mb-2">
       <div>
         <h2 class="mb-6 text-2xl font-bold text-blue-600">📋 Список записей</h2>
       </div>       
         <button class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700" @click="showModal = true">Добавить record</button>
     </div>
     
-    <div class="p-4">
+    <div class="p-1">
       <RecordTable />
     </div>
   
@@ -24,7 +24,7 @@
           <span class="text-blue-500">создать запись</span>
         </div>
        
-        <form @submit.prevent="submitRecord" class="w-[400px] p-4 h-full overflow-y-scroll flex flex-col gap-2 ">
+        <form @submit.prevent="submitRecord" class="relative w-[400px] p-4 pl-6 pb-24 h-full overflow-y-scroll flex flex-col gap-2 ">
           <div>
             <label for="kassa">Касса</label>
             <select v-model="form.cashbox_id" class="input" id="kassa">
@@ -40,12 +40,7 @@
               <option value="0">Расход</option>
             </select>
           </div>
-  
-          <div>
-            <label for="sum">Сумма</label>
-            <input type="number" v-model="form.original_amount" class="input" id="sum" />
-          </div>
-  
+          
           <div>
             <label>Валюта</label>
             <select v-model="form.original_currency" class="input">
@@ -53,6 +48,11 @@
               <option v-for="cur in currencies" :key="cur.code" :value="cur.code">{{ cur.name }}</option>
             </select>
           </div>
+
+          <div>
+            <label for="sum">Сумма</label>
+            <input type="number" v-model="form.original_amount" class="input" id="sum" :disabled="!form.original_currency"/>
+          </div>  
   
           <div>
             <label>Дата</label>
@@ -80,10 +80,22 @@
             <label>Объект</label>
             <input type="text" v-model="form.object" class="input" />
           </div>
-  
-          <button type="submit" class="text-white w-full mt-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ">
-            Сохранить запись
-          </button>
+          <div class="flex justify-between gap-2">
+            <div class="flex-1 text-center flex-col flex justify-center text-blue-500 h-[56px] rounded border-2 border-gray-400">
+              <span>Валюта кассы</span>
+              <span>{{ kassaCurrencyCode }}</span>
+            </div>
+            <div class="flex-1 text-center flex-col flex justify-center text-blue-500 h-[56px] rounded border-2 border-gray-400">
+              <span>Сумма кассы</span>
+              <span>{{ cashboxAmount }}</span>
+            </div>
+          </div>
+
+          <div class="fixed bottom-0 w-full bg-white">
+            <button type="submit" class=" w-[350px]  text-white mt-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 ">
+              Сохранить запись
+            </button>
+          </div>
         </form>
 
       </div>
@@ -116,8 +128,16 @@ export default {
         article_description: '',
         is_debt: false,
         link: '',
-        object: '',
+        object: ''        
       },
+      // dlya wichisleniye
+      kassaCurrencyCode:'?',
+      relativeCurrencyCode: 'USD',
+      cashboxCurrencyRate:null,
+      orginalAmount:null,
+      orginalCurrencyCode:'',
+      orginalExchangeRate: '',
+      cashboxAmount:0
     }
   },
 
@@ -128,7 +148,41 @@ export default {
     ])
     this.currencies = currencyRes.data
     this.cashboxes = cashboxRes.data
+    console.log('currencies: ',this.currencies)
+    console.log('cashboxes: ', this.cashboxes)
     this.loadRecords()
+  },
+
+
+  watch: {
+    'form.cashbox_id'(newCashboxId) {
+      const selectedBox = this.cashboxes.find(box => box.id === newCashboxId);
+      if (selectedBox && selectedBox.currency_id) {
+        const selectedCurrency = this.currencies.find(currency => currency.id === selectedBox.currency_id);
+        this.cashboxCurrencyRate = selectedCurrency.exchange_rates[0].rate
+        this.kassaCurrencyCode = selectedCurrency.code;
+      } else {
+        this.kassaCurrencyCode = '?'
+      }
+    },
+    'form.original_currency'(selectedOriginalCurrencyCode){
+      const currency = this.currencies.find(currency => currency.code === selectedOriginalCurrencyCode)
+      this.orginalExchangeRate = currency.exchange_rates[0].rate
+      this.orginalCurrencyCode = selectedOriginalCurrencyCode
+    },
+
+    'form.original_amount'(orginalAmount){
+
+        this.orginalAmount = orginalAmount;
+
+        if(this.orginalCurrencyCode === this.kassaCurrencyCode){
+          this.cashboxAmount = this.orginalAmount
+        }else if(this.kassaCurrencyCode === this.relativeCurrencyCode){
+          this.cashboxAmount = this.orginalAmount / this.orginalExchangeRate
+          }else{
+            this.cashboxAmount = (this.cashboxCurrencyRate / this.orginalExchangeRate) * this.orginalAmount
+          }
+        },
   },
 
 
@@ -144,21 +198,18 @@ export default {
         console.log(this.form);
         await axios.post('/records', this.form)
         alert('Запись успешно добавлена!')
+        this.showModal = false
         this.$router.push('/records')
       } catch (e) {
         alert('Ошибка при сохранении')
         console.error(e)
       }
     }
+
   },
 }
-
-
-
-
 </script>
+
 <style scoped>
-label{
-  margin:0;
-}
+  label{margin:0;}
 </style>

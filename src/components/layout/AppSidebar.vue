@@ -1,45 +1,31 @@
 <template>
-  <aside class="w-[286px] h-screen space-y-4 bg-[#8a9cfa] shadow text-white flex flex-col justify-between">
+
+  <aside class="w-[286px] h-screen space-y-4 bg-gray-800 shadow text-white flex flex-col justify-between">
     <div>
       <div class=" relative flex justify-center items-center h-[80px]">
-        <div class="flex justify-center items-center h-[25px] aspect-square cursor-pointer bg-blue-500 rounded-full text-white absolute right-[-13px]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </div>
-        <h1 class="text-xl font-semibold">💰 Cash Management</h1>
+        
+        <h1 class="flex gap-2 text-xl font-semibold border-b-2 border-gray-300"><Signal /> Cash Management</h1>
 
       </div>
       <nav class="">
-        <RouterLink to="/analytics" active-class ='font-bold text-white bg-blue-500' class="flex items-center pl-6 hover:bg-blue-500 hover:text-white h-[45px]">📈 Аналитика</RouterLink>
-        <router-link to="/cashboxes" active-class='font-bold text-white bg-blue-500' class="flex items-center pl-6 hover:bg-blue-500 hover:text-white h-[45px]">🏦 Кассы</router-link>
-        <RouterLink to="/currencies" active-class='font-bold text-white bg-blue-500' class="flex items-center pl-6 hover:bg-blue-500 hover:text-white h-[45px]">💱 Валюты</RouterLink>
-        <RouterLink to="/records" active-class='font-bold text-white bg-blue-500' class="flex items-center pl-6 hover:bg-blue-500 hover:text-white h-[45px]">📊 Записи </RouterLink>
-        <RouterLink to="/user" active-class='font-bold text-white bg-blue-500' class="flex items-center pl-6 hover:bg-blue-500 hover:text-white h-[45px]"> пользователи</RouterLink>
+        <RouterLink to="/analytics" active-class ='font-bold text-gray-100 bg-gray-700' class="flex items-center gap-2 text-center text-gray-300 pl-6 hover:bg-gray-700 hover:text-gray-100 h-[45px]"><ChartNoAxesCombined /> Аналитика</RouterLink>
+        <router-link to="/cashboxes" active-class ='font-bold text-gray-100 bg-gray-700' class="flex items-center gap-2 text-center text-gray-300 pl-6 hover:bg-gray-700 hover:text-gray-100 h-[45px]"><Coins /> Кассы</router-link>
+        <RouterLink to="/currencies" active-class ='font-bold text-gray-100 bg-gray-700' class="flex items-center gap-2 text-center text-gray-300 pl-6 hover:bg-gray-700 hover:text-gray-100 h-[45px]"><ChartCandlestick /> Валюты</RouterLink>
+        <RouterLink to="/records" active-class ='font-bold text-gray-100 bg-gray-700' class="flex items-center gap-2 text-center text-gray-300 pl-6 hover:bg-gray-700 hover:text-gray-100 h-[45px]"><ArchiveRestore /> Записи </RouterLink>
+        <RouterLink to="/user" active-class ='font-bold text-gray-100 bg-gray-700' class="flex items-center gap-2 text-center text-gray-300 pl-6 hover:bg-gray-700 hover:text-gray-100 h-[45px]"><UserCog /> пользователи</RouterLink>
       </nav>
     </div>
 
-    <div class="flex flex-row justify-between w-full gap-4">
-      <div>
+    <div class="flex flex-col items-center justify-between w-full gap-4 bg-[#08094627] border-t-2 shadow border-gray-800">
+      <!-- <div class="flex justify-center w-full gap-6">
         <span v-if="user" class="flex flex-row items-center gap-2 font-bold text-white">{{ user.name }} {{ user.role }}
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" 
-              stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-            <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M4 21v-2a4 4 0 0 1 3-3.87"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
         </span>
-      </div>
+        <UserRound />
+      </div> -->
 
-      <button class="flex items-center gap-2 px-4 py-1 text-white bg-blue-500 rounded cursor-pointer"  @click="logout">
+      <button class="flex items-center justify-center gap-4 w-full text-[16px] px-4 py-4 text-white bg-gray-700 rounded cursor-pointer"  @click="logout">
         Выйти
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" 
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="feather feather-log-out">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
+        <LogOut />
       </button>
     </div>
    
@@ -53,13 +39,10 @@ import { useRoute } from 'vue-router'
 export default {
   name: 'AppSidebar',
 
-   setup() {
-    const route = useRoute()
-
-    const isActive = (path) => {
-      return route.path.startsWith(path)
-    }
-    return { isActive }
+   data() {
+    return {
+      route: useRoute()
+    };
   },
   computed: {
     user() {
@@ -72,6 +55,10 @@ export default {
     }
   },
   methods: {
+    isActive(path) {
+      return this.route.path.startsWith(path);
+    },
+
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -80,4 +67,8 @@ export default {
   }
   
 }
+</script>
+<script setup>
+import { ArchiveRestore, ChartCandlestick, ChartNoAxesCombined, Coins, LogOut, Signal, UserCog } from 'lucide-vue-next';
+
 </script>
