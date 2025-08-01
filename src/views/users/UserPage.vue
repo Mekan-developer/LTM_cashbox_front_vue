@@ -1,19 +1,51 @@
 <template>
-    <div class="flex flex-col h-full ">
-        <div class="flex flex-row justify-start gap-1 text-2xl font-semibold items-center h-[40px]  border-b-2 border-b-gray-300 mb-1 ">
-            <div class="flex items-center cursor-pointer h-full px-4 mb-[-3px] text-center border-b-2 border-b-gray-600" >profile</div>
-            <div class="flex items-center cursor-pointer h-full px-4 mb-[-3px] text-center border-b-2 border-b-gray-600">users</div>
-        </div>
-        <div class="flex-1 bg-red-600">
-            <div class="flex items-center justify-between">
-                <PrimaryButton :onclick="() => { showModal(null) }" icon="fas fa-plus">
-                Добавить пользователя
-                </PrimaryButton>
-            </div>
-        </div>
-    </div>   
+  <div class="flex flex-col gap-4 p-4 lg:flex-row">
+    <div class="w-full lg:w-2/3">
+      <UserTable :users="users" @delete-user="deleteUser"/>
+    </div>
+    <div class="w-full lg:w-1/3">
+      <UserForm :roles="roles" @create-user="createUser" />
+    </div>
+  </div>
 </template>
 
 <script>
+import UserTable from '@/components/user/UserTable.vue'
+import UserForm from '@/components/user/UserForm.vue'
+import axios from '@/api/api'
 
+export default {
+  components: {
+    UserTable,
+    UserForm
+  },
+  data() {
+    return {
+      users: [],
+      roles: []
+    }
+  },
+  mounted() {
+    this.fetchUsers()
+    this.fetchRoles()
+  },
+  methods: {
+    async fetchUsers() {
+      const res = await axios.get('/users')
+      this.users = res.data
+    },
+    async fetchRoles() {
+      const res = await axios.get('/roles')
+      this.roles = res.data
+    },
+    async createUser(formData) {
+      await axios.post('/register', formData)
+      this.fetchUsers()
+    },
+    async deleteUser(id) {
+        await axios.delete(`/users/${id}`)
+        this.fetchUsers()
+    }
+  }
+}
 </script>

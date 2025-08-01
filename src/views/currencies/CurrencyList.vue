@@ -1,33 +1,39 @@
 <template>
   <div>
     <div>
-      <h2 class="mb-4 text-2xl font-bold">💱 Управление обменными курсами</h2>
       <!-- Создание или редактирование -->
       <div class="p-4 mb-6 rounded shadow bg-blue-50">
-        <h3 class="mb-2 text-lg font-semibold">Добавить/Изменить курс</h3>
+        <div class="flex flex-row justify-between">
+            <h3 class="mb-2 text-lg font-semibold">Добавить/Изменить курс</h3>
+
+          <button
+              type="submit"
+              class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+              >
+              Сохранить курс
+            </button>
+        </div>
+      
         <form @submit.prevent="saveRate">
+          <div class="mt-4 text-right md:col-span-2">
+          </div>
           <div class="w-full">
-            <div class="flex flex-row w-full gap-4">
+            <div class="flex flex-row w-full gap-4 ">
               <div v-for="currency in currencies" :key="currency.id" class="flex-1">
-                  <label class="block mb-1">{{currency.name}}</label>
+                <div class="flex flex-row text-center items-center gap-2 text-blue-500 text-[13px] font-bold">
+                  <span >{{  currency.name  }}</span>
+                  <span v-if="currency.code == 'USD'" >(Базовая валюта)</span>
+                </div>
                   <input
                     :value="currency.exchange_rates[0]?.rate" 
                     type="number"
                     step="0.0001"
                     class="w-full p-2 border rounded"
                     placeholder="Например: 3.67"
+                    :disabled="currency.code == 'USD'"
                   />           
               </div>
             </div>
-          </div>
-
-          <div class="mt-4 text-right md:col-span-2">
-            <button
-              type="submit"
-              class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
-            >
-              Сохранить курс
-            </button>
           </div>
         </form>
       </div>
@@ -35,34 +41,43 @@
     
 
     <div>
-    <h2 class="mb-4 text-2xl font-bold">💱 Список валют</h2>
-    <div class="p-4 bg-white rounded shadow">
-      <table class="w-full table-auto">
-        <thead>
-          <tr class="text-left bg-gray-100">
-            <th class="p-2">#</th>
-            <th class="p-2">Код</th>
-            <th class="p-2">Название</th>
-            <th class="p-2">actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(currency, index) in currencies" :key="currency.id" class="border-b-2 border-b-gray-200">
-            <td class="p-2">{{ index+1 }}</td>
-            <td class="p-2">{{ currency.code }}</td>
-            <td class="p-2">{{ currency.name }}</td>
-            <td class="p-2">
-              <button @click="editRate(rate)" class="mr-2 text-blue-600 hover:underline">
-                ✏️
-              </button>
-              <button @click="deleteRate(rate.id)" class="text-red-600 hover:underline">
-                🗑️
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <h2 class="flex gap-2 mb-4 text-2xl font-bold text-blue-500">
+       <CircleDollarSign />
+       Список валют
+    </h2>
+    <div class="overflow-x-auto border border-blue-200 rounded-b-lg shadow">
+  <table class="min-w-full divide-y divide-blue-200">
+    <thead class="bg-blue-100">
+      <tr>
+        <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">#</th>
+        <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Код</th>
+        <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Название</th>
+        <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Название</th>
+        <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Действия</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-100">
+      <tr v-for="(currency, index) in currencies" :key="currency.id" class="transition duration-200 hover:bg-blue-50">
+        <td class="px-6 py-4 text-sm text-center text-gray-800">{{ index + 1 }}</td>
+        <td class="px-6 py-4 text-sm text-center text-gray-800">{{ currency.code }}</td>
+        <td class="px-6 py-4 text-sm text-center text-gray-800">{{ currency.name }}</td>
+        <td class="px-6 py-4 text-sm text-center text-gray-800">{{ currency.exchange_rates[0].rate }}</td>
+        <td class="flex flex-row items-center justify-center gap-1 px-6 py-4">
+          <form @submit.prevent="confirmDelete(cashbox)">
+            <button  class="flex items-center px-4 py-2 font-bold text-red-500 rounded cursor-pointer hover:text-red-700">
+                <Trash2 />
+            </button>
+          </form>
+
+          <svg class="w-6 h-6 text-blue-500 cursor-pointer hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+          </svg>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
   </div>
   
   </div>
@@ -142,4 +157,7 @@ export default {
     },
   },
 }
+</script>
+<script setup>
+    import { Trash2, CircleDollarSign } from 'lucide-vue-next';
 </script>

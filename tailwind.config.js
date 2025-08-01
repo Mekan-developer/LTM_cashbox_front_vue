@@ -2,6 +2,9 @@
 export default {
     important: true,
     extend: {
+        fontFamily: {
+          poppins: ['Poppins', 'sans-serif'],
+        },
         colors: {
             'green': {
                 '50': '#f4faf3',

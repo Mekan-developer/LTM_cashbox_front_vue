@@ -1,5 +1,5 @@
 <template>
-  <div class="text-[13px]">
+  <div class="text-[13px] bg-gray-50">
     <div class="flex">
       <AppSidebar v-if="showMenu" />
 
@@ -24,8 +24,6 @@ export default {
     }
   }
 }
-
-
 </script>
 
 <style>
