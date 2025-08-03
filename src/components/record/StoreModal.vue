@@ -1,7 +1,7 @@
 <template>
-      <div v-if="showModalProps" class="fixed inset-0 flex items-center justify-end bg-[#000000e1] text-[14px]">
+      <div class="fixed inset-0 flex items-center justify-end bg-[#000000e1] text-[14px]">
       <div class="relative h-full pb-28 bg-gray-50">
-        <div class="absolute top-0 left-0 flex justify-center items-center w-[40px] rounded-full aspect-square cursor-pointer" @click="close">
+        <div class="absolute top-0 left-0 flex justify-center items-center w-[40px] rounded-full aspect-square cursor-pointer" @click="$emit('close')">
     
             <svg width="24" height="24" class="text-red-900" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -31,7 +31,7 @@
           
           <div>
             <label>Валюта</label>
-            <select v-model="form.original_currency" class="input">
+            <select v-model="form.original_currency" class="input" :disabled="!form.cashbox_id">
               <option value="">-- Выбрать --</option>
               <option v-for="cur in currencies" :key="cur.code" :value="cur.code">{{ cur.name }}</option>
             </select>
@@ -101,11 +101,6 @@ import axios from '@/api/api'
 
 export default {
     props:{
-        showModalProps:{
-            type:Boolean,
-            default:false,
-            required:true
-        },
         getRecords:{
             type:Function,
             required:true
@@ -178,17 +173,14 @@ export default {
 
 
   methods: {
-    close() {
-        this.$emit('update:showModalProps', false); // сообщаем родителю, что нужно закрыть
-    },
    async submitRecord() {
       try {
-        await axios.post('/records', this.form)
-         this.$emit('update:showModalProps', false);
+         const response = await axios.post('/records', this.form);
+        console.log(response);
+         this.$emit('close');
       } catch (e) {
         console.error(e)
       }
-      this.getRecords()
     }
 
   },

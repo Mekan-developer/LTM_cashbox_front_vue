@@ -4,17 +4,17 @@
      <div class="flex items-center gap-6 p-4 border border-b-0 border-blue-200 shadow-sm bg-blue-50 rounded-t-xl">
         <span class="p-0 m-0 font-semibold text-gray-700">Тип:</span>
 
-        <label class="flex items-center gap-2 text-gray-600">
+        <label class="flex items-center gap-2 text-gray-600 cursor-pointer">
           <input type="radio" name="type" v-model="selectedType" value="all" class="accent-blue-500" />
           <span>Все</span>
         </label>
 
-        <label class="flex items-center gap-2 text-green-600">
+        <label class="flex items-center gap-2 text-green-600 cursor-pointer">
           <input type="radio" name="type" v-model="selectedType" value="income" class="accent-green-500" />
           <span>Доход</span>
         </label>
 
-        <label class="flex items-center gap-2 text-red-600">
+        <label class="flex items-center gap-2 text-red-600 cursor-pointer">
           <input type="radio" name="type" v-model="selectedType" value="expense" class="accent-red-500" />
           <span>Расход</span>
         </label>
@@ -23,17 +23,17 @@
       <div class="flex items-center gap-6 p-4 border border-b-0 border-blue-200 shadow-sm bg-blue-50 rounded-t-xl">
         <span class="p-0 m-0 font-semibold text-gray-700">Статус долга:</span>
 
-        <label class="flex items-center gap-2 text-gray-600">
+        <label class="flex items-center gap-2 text-gray-600 cursor-pointer">
           <input type="radio" name="deptType" v-model="selectedDept" value="all" class="accent-blue-500" />
           <span>Все</span>
         </label>
 
-        <label class="flex items-center gap-2 text-green-600">
+        <label class="flex items-center gap-2 text-green-600 cursor-pointer">
           <input type="radio" name="deptType" v-model="selectedDept" :value="true" class="accent-red-500" />
           <span>Долги</span>
         </label>
 
-        <label class="flex items-center gap-2 text-red-600">
+        <label class="flex items-center gap-2 text-red-600 cursor-pointer">
           <input type="radio" name="deptType" v-model="selectedDept" :value="false" class="accent-green-500" />
           <span>Без долгов</span>
         </label>
@@ -86,7 +86,7 @@
             v-for="(record, index) in sortedRecords"
             :key="record.id"
             :class="['transition duration-200 hover:bg-blue-50',
-              record.is_debt ? 'bg-red-100 text-white' : ''
+              record.is_debt ? record.type === 'income'?'bg-green-100':'bg-red-100' : ''
             ]"
           >
             <td class="px-6 py-4 text-sm text-gray-800">{{ index + 1 }}</td>
@@ -107,16 +107,14 @@
             <td class="px-6 py-4 text-sm text-gray-500 text-nowrap">{{ record.date }}</td>
             <td class="px-6 py-4 text-sm text-gray-500">{{ record.article_description }}</td>
 
-            <td class="flex flex-row items-center justify-center gap-1 px-6 py-4">
+            <td class="flex flex-row items-center justify-center gap-1 px-6 py-4 text-red-600">
               <form @submit.prevent="confirmDelete(record)">
                 <button  class="flex items-center px-4 py-2 font-bold text-red-500 rounded cursor-pointer hover:text-red-700">
                    <Trash2 />
                 </button>
               </form>
 
-              <svg class="w-6 h-6 text-blue-500 cursor-pointer hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-              </svg>
+              <button class="cursor-pointer"><PencilLine /></button>
             </td>
           </tr>
         </tbody>
@@ -180,7 +178,6 @@ export default {
     }
   },
   methods:{
-
     toggleSortByDate() {
       this.sortDateAsc = !this.sortDateAsc;
     },
@@ -190,14 +187,14 @@ export default {
     },
     async deleteRecord(id) {
       await axios.delete(`/records/${id}`)
-      this.getRecords()
       this.showModal = false
       this.selectedRecord = null
+      this.$emit('getRecords')
     }
 
   }
 }
 </script>
 <script setup>
-    import { Trash2 } from 'lucide-vue-next';
+    import { PencilLine, Trash2 } from 'lucide-vue-next';
 </script>

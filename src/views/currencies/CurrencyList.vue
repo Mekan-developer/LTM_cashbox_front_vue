@@ -19,7 +19,7 @@
                 </div>
                   <input
                     :value="currency.exchange_rates[0]?.rate" 
-                    @change="editExchangeRate(currency.id, $event.target.value)"
+                    @change="updateExchangeRate(currency.id, $event.target.value)"
                     type="number"
                     step="0.0001"
                     class="w-full p-2 border rounded"
@@ -102,7 +102,7 @@ export default {
     this.loadRates();
   },
   methods: {
-    async editExchangeRate(rateId, newRate) {
+    async updateExchangeRate(rateId, newRate) {
       try {
         await axios.patch(`exchange-rates/${rateId}`, {
           rate: parseFloat(newRate),

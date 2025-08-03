@@ -8,11 +8,10 @@
     </div>
     
     <div class="p-1">
-      <RecordTable :records="records"/>
-    </div>
-  
-    <StoreModal v-model:showModalProps="showModal" :getRecords="getRecords" />
-  
+      <RecordTable :records="records" @getRecords = "getRecords"/>
+    </div>  
+    <StoreModal v-if="showModal" @close="handleClose" :getRecords="getRecords" />
+
   </div>
 </template>
 
@@ -40,6 +39,11 @@ export default {
     this.getRecords()
   },
   methods: {
+    handleClose(){
+      this.showModal = false;
+      this.getRecords()
+
+    },
      async getRecords(){
       const res = await axios.get('/records')
       this.records = res.data
