@@ -128,7 +128,7 @@
       v-if="showModal"
       :title="'Удалить запись'"
       :message="'Вы уверены, что хотите удалить «' + selectedRecord.cashbox?.title + '»?'"
-      @confirm="deleteRecord(selectedRecord.cashbox.id)"
+      @confirm="deleteRecord(selectedRecord.id)"
       @cancel="showModal = false"
     />
   </div>
@@ -139,12 +139,16 @@ import axios from '@/api/api' // или укажи прямо путь до тв
 import ConfirmModal from '@/components/ConfirmModal.vue'
 
 export default {
-      components: { ConfirmModal },
-      
+  components: { ConfirmModal },
+  props:{
+    records:{
+      type:Array,
+      required:true
+    }
+  },
   data() {
     return {
       id: null,
-      records: [],
       selectedType: 'all',
       selectedDept: 'all',
       sortDateAsc: true, // true = ASC, false = DESC
@@ -153,36 +157,29 @@ export default {
     }
   },
   async mounted() {
-    this.getRecords()
+    
     
   },
   
   computed: {
-  filteredRecords() {
-    return this.records.filter(record => {
-      const matchType = this.selectedType === 'all' || record.type === this.selectedType;
-      const matchDept = this.selectedDept === 'all' || record.is_debt === this.selectedDept;
-      return matchType && matchDept;
-    });
-  },
-
-  sortedRecords() {
-    return [...this.filteredRecords].sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-
-      return this.sortDateAsc ? dateA - dateB : dateB - dateA;
-    });
-  }
-},
-
-
-  methods:{
-    async getRecords(){
-      const res = await axios.get('/records')
-      this.records = res.data
-      console.log('testtt:', this.records)
+    filteredRecords() {
+      return this.records.filter(record => {
+        const matchType = this.selectedType === 'all' || record.type === this.selectedType;
+        const matchDept = this.selectedDept === 'all' || record.is_debt === this.selectedDept;
+        return matchType && matchDept;
+      });
     },
+
+    sortedRecords() {
+      return [...this.filteredRecords].sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        return this.sortDateAsc ? dateA - dateB : dateB - dateA;
+      });
+    }
+  },
+  methods:{
 
     toggleSortByDate() {
       this.sortDateAsc = !this.sortDateAsc;

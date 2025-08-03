@@ -77,7 +77,6 @@ export default {
       }
     },
     mounted(){
-      console.log(this.cashboxes);
     },
   methods: {
     // async fetchCashboxes() {

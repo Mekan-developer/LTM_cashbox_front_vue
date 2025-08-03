@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
 import CashboxList from "../views/cashboxs/CashboxView.vue";
-import AnalyticsDashboard from "@/views/AnalyticsDashboard.vue";
+import AnalyticsDashboard from "@/views/analytics/AnalyticsDashboard.vue";
 import CurrencyList from "@/views/currencies/CurrencyList.vue";
 import RecordList from "@/views/records/RecordList.vue";
 // import RecordCreate from "@/views/records/RecordCreate.vue";
