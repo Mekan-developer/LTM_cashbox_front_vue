@@ -114,7 +114,7 @@
                 </button>
               </form>
 
-              <button class="cursor-pointer"><PencilLine /></button>
+              <button class="cursor-pointer" @click="$emit('edit',record)"><PencilLine /></button>
             </td>
           </tr>
         </tbody>
@@ -133,7 +133,7 @@
 </template>
 
 <script>
-import axios from '@/api/api' // или укажи прямо путь до твоего axios
+import axios from '@/services/api' // или укажи прямо путь до твоего axios
 import ConfirmModal from '@/components/ConfirmModal.vue'
 
 export default {

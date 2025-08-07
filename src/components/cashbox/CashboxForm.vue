@@ -42,7 +42,7 @@
 
 
 <script>
-import axios from '@/api/api';
+import axios from '@/services/api';
 
 export default{
     props:{
@@ -74,15 +74,15 @@ export default{
         this.fetchCurrencies()
     },
     watch: {
-    cashbox: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.form = { ...newVal };
+        cashbox: {
+        immediate: true,
+        handler(newVal) {
+            if (newVal) {
+            this.form = { ...newVal };
+            }
         }
-      }
-    }
-  },    
+        }
+    },    
     methods:{
         close() {
             this.$emit('update:showModalProps',false); // сообщаем родителю, что нужно закрыть

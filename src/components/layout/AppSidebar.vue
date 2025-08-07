@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import api from '@/services/api'
 
 import { useRoute } from 'vue-router'
 
@@ -59,10 +60,11 @@ export default {
       return this.route.path.startsWith(path);
     },
 
-    logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      this.$router.push('/login');
+     async logout() {
+      await api.post('/logout')
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      this.$router.push('/login')
     }
   }
   

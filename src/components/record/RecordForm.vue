@@ -1,5 +1,5 @@
 <template>
-      <div class="fixed inset-0 flex items-center justify-end bg-[#000000e1] text-[14px]">
+      <div class="fixed inset-0 flex items-center justify-end bg-[#000000e1] text-[14px]" >
       <div class="relative h-full pb-28 bg-gray-50">
         <div class="absolute top-0 left-0 flex justify-center items-center w-[40px] rounded-full aspect-square cursor-pointer" @click="$emit('close')">
     
@@ -12,7 +12,7 @@
           <span class="text-blue-500">создать запись</span>
         </div>
        
-        <form @submit.prevent="submitRecord" class="w-[400px] p-4 pl-6 pb-24 h-full overflow-y-scroll flex flex-col gap-2 ">
+        <form @submit.prevent="submit" class="w-[400px] p-4 pl-6 pb-24 h-full overflow-y-scroll flex flex-col gap-2 ">
           <div>
             <label for="kassa">Касса</label>
             <select v-model="form.cashbox_id" class="input" id="kassa">
@@ -73,7 +73,7 @@
           <div class="absolute bottom-0 left-0 w-full p-4 pt-2 pl-6 bg-gray-50 ">
             <div class="absolute left-0 w-full h-[2px] bg-blue-200 -top-[3px] blur-[2px]"></div>
             <div class="pr-3">
-              <div class="flex justify-between gap-2">
+              <div class="flex justify-between gap-2" v-if="!isEditMode">
                 <div class="px-4 flex-1 bg-gray-200  text-center flex-col flex justify-center text-blue-500 h-[56px] rounded ">
                   <span>Валюта кассы</span>
                   <span>{{ kassaCurrencyCode }}</span>
@@ -85,7 +85,7 @@
               </div>
             
               <button type="submit" class=" w-[350px]  text-white mt-4 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center  mb-2 ">
-                Сохранить запись
+                    {{ isEditMode ? 'Обновить' : 'Создать' }}
               </button>
             </div>
           </div>
@@ -97,14 +97,16 @@
 
 
 <script>
-import axios from '@/api/api'
+import axios from '@/services/api'
 
 export default {
     props:{
         getRecords:{
             type:Function,
             required:true
-        }
+        },
+        record: Object,
+        isEditMode: Boolean
     },
   data() {
     return {    
@@ -129,7 +131,9 @@ export default {
       orginalAmount:null,
       orginalCurrencyCode:'',
       orginalExchangeRate: '',
-      cashboxAmount:0
+      cashboxAmount:0,
+      //dlya edit
+     
     }
   },
 
@@ -138,11 +142,31 @@ export default {
       axios.get('/currencies'),
       axios.get('/cashboxes'),
     ])
+    console.log('check:',this.record);
     this.currencies = currencyRes.data
     this.cashboxes = cashboxRes.data
   },
 
   watch: {
+    
+  record: {
+    immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          // Копируем данные
+          const updatedForm = { ...newVal };
+
+          // Заменяем строковый тип на числовой
+          if (updatedForm.type === 'income') {
+            updatedForm.type = 1;
+          } else if (updatedForm.type === 'expense') {
+            updatedForm.type = 0;
+          }
+
+          this.form = updatedForm;
+        }
+      }
+    },
     'form.cashbox_id'(newCashboxId) {
       const selectedBox = this.cashboxes.find(box => box.id === newCashboxId);
       if (selectedBox && selectedBox.currency_id) {
@@ -173,16 +197,21 @@ export default {
 
 
   methods: {
-   async submitRecord() {
+   async submit() {
       try {
-         const response = await axios.post('/records', this.form);
-        console.log(response);
-         this.$emit('close');
+        if (this.isEditMode) {
+          await axios.put(`/records/${this.record.id}`, this.form);
+        } else {
+          await axios.post('/records', this.form);
+        }
+        this.$emit('close');
       } catch (e) {
-        console.error(e)
+        alert('Ошибка: ' + e);
       }
     }
-
   },
 }
 </script>
+<style scoped>
+  label{margin:0;}
+</style>

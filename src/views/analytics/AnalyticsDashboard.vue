@@ -58,72 +58,85 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
 import Chart from 'chart.js/auto'
-import API from '@/api/api'
+import API from '@/services/api'
 
 export default {
-  setup() {
-    const summary = ref({
-      income: 0,
-      expense: 0,
-      balance: 0,
-      by_cashbox: []
-    })
-
-    const cashboxes = ref([])
-    const currency = 'TMT'
-
-    const filters = ref({
-      cashbox_id: '',
-      from: '',
-      to: ''
-    })
-
-    const loadData = async () => {
-      const res = await API.get('/analytics/summary', { params: filters.value })
-      summary.value = res.data
-      renderCharts(res.data)
+  data() {
+    return {
+      summary: {
+        income: 0,
+        expense: 0,
+        balance: 0,
+        by_cashbox: []
+      },
+      cashboxes: [],
+      currency: 'TMT',
+      filters: {
+        cashbox_id: '',
+        from: '',
+        to: ''
+      }
     }
+  },
 
-    const renderCharts = (data) => {
+  methods: {
+    async loadData() {
+      try {
+        const res = await API.get('/analytics/summary', {
+          params: this.filters
+        })
+        this.summary = res.data
+        this.renderCharts(res.data)
+      } catch (e) {
+        console.error('Ошибка при загрузке аналитики:', e)
+      }
+    },
+
+    renderCharts(data) {
       // 🟦 Bar chart
       const barCtx = document.getElementById('cashboxChart')
-      new Chart(barCtx, {
-        type: 'bar',
-        data: {
-          labels: data.by_cashbox.map(cb => cb.cashbox.title),
-          datasets: [{
-            label: 'Баланс',
-            data: data.by_cashbox.map(cb => cb.balance),
-            backgroundColor: '#3b82f6'
-          }]
-        },
-        options: { responsive: true }
-      })
+      if (barCtx) {
+        new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: data.by_cashbox.map(cb => cb.cashbox.title),
+            datasets: [{
+              label: 'Баланс',
+              data: data.by_cashbox.map(cb => cb.balance),
+              backgroundColor: '#3b82f6'
+            }]
+          },
+          options: { responsive: true }
+        })
+      }
 
       // 🟢 Pie chart
       const pieCtx = document.getElementById('pieChart')
-      new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-          labels: ['Доходы', 'Расходы'],
-          datasets: [{
-            data: [data.income, data.expense],
-            backgroundColor: ['#22c55e', '#ef4444']
-          }]
-        },
-        options: { responsive: true }
-      })
+      if (pieCtx) {
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Доходы', 'Расходы'],
+            datasets: [{
+              data: [data.income, data.expense],
+              backgroundColor: ['#22c55e', '#ef4444']
+            }]
+          },
+          options: { responsive: true }
+        })
+      }
     }
+  },
 
-    onMounted(async () => {
-      const cb = await API.get('/cashboxes')
-      cashboxes.value = cb.data
-      loadData()
-    })
-
-    return { summary, currency, cashboxes, filters, loadData }
+  async mounted() {
+    try {
+      const res = await API.get('/cashboxes')
+      this.cashboxes = res.data
+      this.loadData()
+    } catch (e) {
+      console.error('Ошибка при загрузке касс:', e)
+    }
   }
 }
 </script>

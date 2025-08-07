@@ -4,7 +4,7 @@
 
       <table class="min-w-full divide-y divide-blue-200">
         <thead class="bg-blue-100">
-          <tr class="">
+          <tr >
             <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">#</th>
             <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Название</th>
             <th class="px-6 py-3 text-sm font-semibold text-center text-blue-900 uppercase">Валюта</th>
@@ -54,7 +54,7 @@
 
 
 <script>
-import axios from '@/api/api';
+import axios from '@/services/api';
 import ConfirmModal from '@/components/ConfirmModal.vue'
 
 export default {

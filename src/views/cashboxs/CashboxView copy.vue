@@ -4,7 +4,6 @@
       <h1 class="mb-6 text-2xl font-bold text-blue-600">Кассы</h1>
       <button @click="showModal = true" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">Добавить кассу</button>
     </div>
-    
     <CashboxTable :cashboxes="cashboxes" :onRefresh="fetchCashboxes" @edit="handleEdit"/>
     <CashboxForm 
       v-if="showModal"

@@ -8,16 +8,19 @@
     </div>
     
     <div class="p-1">
-      <RecordTable :records="records" @getRecords = "getRecords"/>
+      <RecordTable :records="records" @getRecords = "getRecords" @edit="handleEdit"/>
     </div>  
-    <StoreModal v-if="showModal" @close="handleClose" :getRecords="getRecords" />
+    <StoreModal v-if="showModal" 
+    @close="handleClose" :getRecords="getRecords"
+    :record="selectedRecord"
+    v-model:is-edit-mode="isEditMode" />
 
   </div>
 </template>
 
 <script>
-import axios from '@/api/api'
-import StoreModal from '@/components/record/StoreModal.vue'
+import axios from '@/services/api'
+import StoreModal from '@/components/record/RecordForm.vue'
 import RecordTable from '@/components/record/RecordTable.vue'
 
 export default {
@@ -31,7 +34,9 @@ export default {
 // for create record
       currencies: [],
       cashboxes: [],
-
+      //for edit
+      isEditMode: false,
+      selectedRecord:null
     }
   },
 
@@ -39,8 +44,15 @@ export default {
     this.getRecords()
   },
   methods: {
+    handleEdit(record) {
+      this.selectedRecord = { ...record }; // копия объекта
+      this.showModal = true;
+      this.isEditMode = true;
+    },
     handleClose(){
       this.showModal = false;
+      this.selectedRecord = null;
+      this.isEditMode = false;
       this.getRecords()
 
     },
@@ -53,6 +65,3 @@ export default {
 }
 </script>
 
-<style scoped>
-  label{margin:0;}
-</style>

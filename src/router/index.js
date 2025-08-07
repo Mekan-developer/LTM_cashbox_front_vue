@@ -43,14 +43,12 @@ const router = createRouter({
 
 // Redirect if not logged in
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("token");
-  if (to.meta.requiresAuth && !token) {
-    next("/login");
-  } else if (to.path === "/login" && token) {
-    next("/");
+  const token = localStorage.getItem('token')
+  if (to.matched.some(r => r.meta.requiresAuth) && !token) {
+    next('/login')
   } else {
-    next();
+    next()
   }
-});
+})
 
 export default router;

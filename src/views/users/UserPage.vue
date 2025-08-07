@@ -12,7 +12,7 @@
 <script>
 import UserTable from '@/components/user/UserTable.vue'
 import UserForm from '@/components/user/UserForm.vue'
-import axios from '@/api/api'
+import axios from '@/services/api'
 
 export default {
   components: {

@@ -16,9 +16,9 @@
           <td class="px-4 py-2">{{ index+1 }}</td>
           <td class="px-4 py-2">{{ user.name }}</td>
           <td class="px-4 py-2">{{ user.email }}</td>
-          <td class="px-4 py-2">{{ user.roles[0]?.title || '—' }}</td>
+          <td class="px-4 py-2">{{ user.roles[0] || '—' }}</td>
            <td class="flex items-center px-4 py-2">
-          <form @submit.prevent="deleteUser(user)">
+          <form @submit.prevent="confirmDelete(user)">
             <button  class="flex items-center px-4 py-2 font-bold text-red-500 rounded cursor-pointer hover:text-red-700">
                 <Trash2 />
             </button>
@@ -58,6 +58,7 @@ export default {
   methods:{
     deleteUser(id){
         this.$emit('delete-user', id)
+        this.showModal = false
     },
      confirmDelete(user) {
       this.selectedUser = user
